@@ -1,7 +1,7 @@
 const Express = require('express');
 const express = Express();
 const fs = require("fs");
-const functions = require("./utils/functions/functions.js");
+const log = require("./utils/base/log.js");
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '.', 'config', '.env')});
 
@@ -18,7 +18,7 @@ fs.readdirSync(load).forEach(fileName => {
 });
 
 express.use((req, res, next) => {
-    console.log(`${req.method} ${req.originalUrl}`);
+    log.backend(`${req.method} ${req.originalUrl}`);
     next();
 });
 
@@ -30,7 +30,7 @@ express.get('/', async (req,res) => {
 });
 
 express.listen(port, () => {
-    console.log(`started on port ${port}`);
+    log.backend(`started on port ${port}`);
 });
 
 module.exports = express
