@@ -1,4 +1,10 @@
 {
+  "name": "com.itztiva.www",
+  "version": "1.0.0",
+  "main": "main/index.js",
+  "scripts": {
+    "start": "node ."
+  },
   "dependencies": {
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
