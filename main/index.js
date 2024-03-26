@@ -18,14 +18,25 @@ fs.readdirSync(load).forEach(fileName => {
 });
 
 express.use((req, res, next) => {
-    log.backend(`${req.method} ${req.originalUrl}`);
-    next();
+    if (req.originalUrl === '/favicon.ico') {
+      next(); 
+    } else {
+      log.backend(`${req.method} ${req.originalUrl}`);
+      next();
+    }
+});
+
+express.get('/', async (req, res) => {
+    res.json({
+        message: "uhm idk man im bored"
+    });
 });
 
 
-express.get('/', async (req,res) => {
-    res.json({
-        message: "uhm idk man im bored"
+express.use(async (req, res, next) => {
+    log.backend("Error: " + req.path);
+    res.status(404).json({
+        error: 'Route does not exist'
     });
 });
 

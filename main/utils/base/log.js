@@ -5,11 +5,11 @@ class Logger {
     }
 
     debug(...messages) {
-        console.log(`\x1b[37m[\x1b[36mDebug\x1b[0m\x1b[37m]`, ...messages);
+        console.log(`\x1b[37m[\x1b[36mDEBUG\x1b[0m\x1b[37m]`, ...messages);
     }
 
     auth(...messages) {
-        console.log(`\x1b[37m[\x1b[31mWEBSITE\x1b[0m\x1b[37m]`, ...messages);
+        console.log(`\x1b[37m[\x1b[31mAUTH\x1b[0m\x1b[37m]`, ...messages);
     }
 
 }

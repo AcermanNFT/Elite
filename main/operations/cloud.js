@@ -1,13 +1,17 @@
 const Express = require("express");
 const express = Express();
 const path = require("path");
+const crypto = require("crypto");
+const log = require("../utils/base/log.js");
+const fs = require("fs");
+const hotfixPath = path.join(__dirname, '../local/cloud/');
 require("dotenv").config({
   path: path.resolve(__dirname, ".", "config", ".env"),
 });
 
 express.get("/fortnite/api/cloudstorage/system/config", async (req, res) => {
   var csFiles = [];
-  for (var file of fs.readdirSync("cloud")) {
+  for (var file of fs.readdirSync("../local/cloud/")) {
     var f = fs.readFileSync("../local/cloud/" + file).toString();
     csFiles.push({
       uniqueFilename: file,
@@ -26,36 +30,41 @@ express.get("/fortnite/api/cloudstorage/system/config", async (req, res) => {
   res.json(csFiles);
 });
 
-express.get(
-  "/fortnite/api/cloudstorage/system/:file",
-  async (req, res, next) => {
-    try {
-      if (req.params.file.includes("..")) {
-        return res.status(404).json({
-          errorCode: "404",
-          errorname: "errors.Tiva.Nice.Try.Bud",
-          errorMessage: "cant access files that arent cloudstorage!",
-          numericErrorCode: 404,
-          originatingService: "any",
-          intent: "prod",
+express.get('/fortnite/api/cloudstorage/system/:filename', (req, res) => {
+  const fileName = req.params.filename;
+  const filePath = path.join(__dirname, '../local/cloud', fileName);
+
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).end();
+  }
+});
+
+express.get('/fortnite/api/cloudstorage/system', async (req, res) => {
+  log.auth('New login to Elite!')
+  const output = [];
+      const dir = await fs.promises.opendir(hotfixPath);
+      for await (const dirent of dir) {
+        const fileName = dirent.name;
+        const filePath = hotfixPath + fileName;
+        const fileData = fs.readFileSync(filePath);
+  
+        output.push({
+          "uniqueFilename": fileName,
+          "filename": fileName,
+          "hash": crypto.createHash("sha1").update(fileData).digest("hex"),
+          "hash256": crypto.createHash("sha256").update(fileData).digest("hex"),
+          "length": fileData.length,
+          "contentType": "text/plain",
+          "uploaded": fs.statSync(filePath).mtime,
+          "storageType": "S3",
+          "doNotCache": false
         });
       }
-      const data = fs
-        .readFileSync("../local/cloud/" + req.params.file)
-        .toString();
-      res.send(data);
-    } catch (error) {
-      return res.status(404).json({
-        errorCode: "404",
-        errorname: "errors.Tiva.Nice.Try.Bud",
-        errorMessage: "cant access files that arent cloudstorage!",
-        numericErrorCode: 404,
-        originatingService: "any",
-        intent: "prod",
-      });
-    };
-  }
-);
+  
+      res.json(output);
+  });
 
 express.use((req, res, next) => {
   if (
