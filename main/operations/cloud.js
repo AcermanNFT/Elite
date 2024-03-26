@@ -13,8 +13,8 @@ express.get("/fortnite/api/cloudstorage/system/config", async (req, res) => {
   for (var file of fs.readdirSync("../local/cloud/")) {
     var f = fs.readFileSync("../local/cloud/" + file).toString();
     csFiles.push({
-      uniqueFilename: file,
-      filename: file,
+      uniqueF: file,
+      F: file,
       hash: crypto.createHash("sha1").update(f).digest("hex"),
       hash256: crypto.createHash("sha256").update(f).digest("hex"),
       length: f.length,
@@ -29,12 +29,12 @@ express.get("/fortnite/api/cloudstorage/system/config", async (req, res) => {
   res.json(csFiles);
 });
 
-express.get('/fortnite/api/cloudstorage/system/:filename', (req, res) => {
-  const fileName = req.params.filename;
-  const filePath = path.join(__dirname, '../local/cloud', fileName);
+express.get('/fortnite/api/cloudstorage/system/:F', (req, res) => {
+  const F = req.params.F;
+  const FP = path.join(__dirname, '../local/cloud', F);
 
-  if (fs.existsSync(filePath)) {
-    res.sendFile(filePath);
+  if (fs.existsSync(FP)) {
+    res.sendFile(FP);
   } else {
     res.status(404).end();
   }
@@ -45,18 +45,18 @@ express.get('/fortnite/api/cloudstorage/system', async (req, res) => {
   const output = [];
       const dir = await fs.promises.opendir('../local/cloud');
       for await (const dirent of dir) {
-        const fileName = dirent.name;
-        const filePath = path.join(__dirname, '../local/cloud', fileName);
-        const fileData = fs.readFileSync(filePath);
+        const F = dirent.name;
+        const FP = path.join(__dirname, '../local/cloud', F);
+        const FD = fs.readFileSync(FP);
   
         output.push({
-          "uniqueFilename": fileName,
-          "filename": fileName,
-          "hash": crypto.createHash("sha1").update(fileData).digest("hex"),
-          "hash256": crypto.createHash("sha256").update(fileData).digest("hex"),
-          "length": fileData.length,
+          "uniqueF": F,
+          "F": F,
+          "hash": crypto.createHash("sha1").update(FD).digest("hex"),
+          "hash256": crypto.createHash("sha256").update(FD).digest("hex"),
+          "length": FD.length,
           "contentType": "text/plain",
-          "uploaded": fs.statSync(filePath).mtime,
+          "uploaded": fs.statSync(FP).mtime,
           "storageType": "S3",
           "doNotCache": false
         });
