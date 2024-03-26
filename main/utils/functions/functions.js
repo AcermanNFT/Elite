@@ -1,8 +1,34 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require('crypto');
 const Express = require('express');
 const express = Express();
 require('dotenv').config({ path: path.resolve(__dirname, '.', 'config', '.env')});
+
+function generateRandomSecret() {
+    return crypto.randomBytes(16).toString('hex'); 
+}
+
+const verifysecret = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const secret = authHeader.split(' ')[1];
+
+    try {
+        const user = await User.findOne({ secret: secret }).exec();
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        req.user = user; 
+        next();
+    } catch (err) {
+        log.debug(err);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 function version(req) {
     let ver = {
@@ -117,5 +143,7 @@ function contentpages(req) {
 
 module.exports = {
     contentpages,
-    version
+    version,
+    generateRandomSecret,
+    verifysecret
 };

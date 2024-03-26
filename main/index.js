@@ -1,11 +1,19 @@
 const Express = require('express');
 const express = Express();
+const mongoose = require('mongoose');
 const fs = require("fs");
 const log = require("./utils/base/log.js");
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '.', 'config', '.env')});
 
 const port = process.env.PORT
+
+mongoose.set('strictQuery', false);
+mongoose.connect(process.env.DB);
+
+mongoose.connection.on('connected', () => {
+    log.backend('Connected to MongoDB');
+});
 
 const load = path.join(__dirname, 'operations');
 

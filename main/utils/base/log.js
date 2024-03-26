@@ -12,6 +12,10 @@ class Logger {
         console.log(`\x1b[37m[\x1b[31mAUTH\x1b[0m\x1b[37m]`, ...messages);
     }
 
+    frontend(...messages) {
+        console.log(`\x1b[37m[\x1b[35mFRONTEND\x1b[0m\x1b[37m]`, ...messages);
+    }
+
 }
 
 module.exports = new Logger();
