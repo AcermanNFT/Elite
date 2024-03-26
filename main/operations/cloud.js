@@ -6,7 +6,7 @@ const log = require("../utils/base/log.js");
 const fs = require("fs");
 require("dotenv").config({
   path: path.resolve(__dirname, ".", "config", ".env"),
-});
+}); 
 
 express.get("/fortnite/api/cloudstorage/system/config", async (req, res) => {
   var csFiles = [];
