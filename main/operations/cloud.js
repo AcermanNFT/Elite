@@ -41,12 +41,13 @@ express.get('/fortnite/api/cloudstorage/system/:F', (req, res) => {
 });
 
 express.get('/fortnite/api/cloudstorage/system', async (req, res) => {
-  log.auth('New login to Elite!')
-  const output = [];
-      const dir = await fs.promises.opendir('../local/cloud');
+  if (!req.headers['user-agent'] || !req.headers['user-agent'].includes('Mozilla')) {
+    log.auth('New login to Elite!');
+  }  const output = [];
+      const dir = await fs.promises.opendir('../Elite/main/local/cloud/');
       for await (const dirent of dir) {
         const F = dirent.name;
-        const FP = path.join(__dirname, '../local/cloud', F);
+        const FP = path.join(__dirname, '../local/cloud/', F);
         const FD = fs.readFileSync(FP);
   
         output.push({
