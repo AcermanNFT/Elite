@@ -4,7 +4,6 @@ const path = require("path");
 const crypto = require("crypto");
 const log = require("../utils/base/log.js");
 const fs = require("fs");
-const hotfixPath = path.join(__dirname, '../local/cloud/');
 require("dotenv").config({
   path: path.resolve(__dirname, ".", "config", ".env"),
 });
@@ -44,10 +43,10 @@ express.get('/fortnite/api/cloudstorage/system/:filename', (req, res) => {
 express.get('/fortnite/api/cloudstorage/system', async (req, res) => {
   log.auth('New login to Elite!')
   const output = [];
-      const dir = await fs.promises.opendir(hotfixPath);
+      const dir = await fs.promises.opendir('../local/cloud');
       for await (const dirent of dir) {
         const fileName = dirent.name;
-        const filePath = hotfixPath + fileName;
+        const filePath = path.join(__dirname, '../local/cloud', fileName);
         const fileData = fs.readFileSync(filePath);
   
         output.push({
