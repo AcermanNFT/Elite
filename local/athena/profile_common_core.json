@@ -3,7 +3,7 @@
   "Update": "elite",
   "created": "2021-03-07T16:33:28.462Z",
   "updated": "2024-05-20T14:57:29.907Z",
-  "rvn": 0,
+  "rvn": 1,
   "wipeNumber": 1,
   "accountId": "",
   "profileId": "common_core",
@@ -6509,7 +6509,7 @@
   },
   "stats": {
     "attributes": {
-      "mtx_affiliate": "FORTNITE.DEV",
+      "mtx_affiliate": "Itztiva",
       "current_mtx_platform": "EpicPC",
       "mtx_purchase_history": {}
     }

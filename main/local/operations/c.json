@@ -348,18 +348,16 @@
     "_locale": "en-US"
   },
   "dynamicbackgrounds": {
-    "jcr:isCheckedOut": true,
     "backgrounds": {
       "backgrounds": [
         {
-          "backgroundimage": "https://cdn2.unrealengine.com/t-bp-17-lobby-summer-2048x1024-709fa99e6be0.png",
+          "backgroundimage": "https://cdn2.unrealengine.com/br-lobby-ch5s2-4096x2304-a0879ccdaafc.jpg",
           "stage": "defaultnotris",
           "_type": "DynamicBackground",
           "key": "lobby"
         },
         {
-          "backgroundimage": "https://cdn2.unrealengine.com/water-texture-2048x1024-8531891f2d38.jpg",
-          "stage": "summer",
+          "stage": "default",
           "_type": "DynamicBackground",
           "key": "vault"
         }
@@ -368,10 +366,10 @@
     },
     "_title": "dynamicbackgrounds",
     "_noIndex": false,
-    "jcr:baseVersion": "a7ca237317f1e70712af90-59fe-4576-8f32-f80bf513c946",
-    "_activeDate": "2020-07-06T06:00:00.000Z",
-    "lastModified": "2021-06-22T13:53:48.402Z",
-    "_locale": "en-US"
+    "_activeDate": "2023-11-03T07:30:00.000Z",
+    "lastModified": "2024-03-08T08:19:52.536Z",
+    "_locale": "en-US",
+    "_templateName": "FortniteGameDynamicBackgrounds"
   },
   "subgameselectdata": {
     "saveTheWorldUnowned": {

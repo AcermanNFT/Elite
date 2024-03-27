@@ -29,10 +29,10 @@ function loadProfile(profileId) {
     }
     return JSON.parse(fs.readFileSync(profilePath));
 }
-
-function saveConfig(accountId, data) {
-    const profilePath = getProfilePath(accountId);
-    fs.writeFileSync(profilePath, JSON.stringify(data, null, 2));
+function saveConfig(directory, accountId, config) {
+    const profilePath = getProfilePath(directory, accountId);
+    console.log("Profile Path:", profilePath); // Log the profile path
+    fs.writeFileSync(profilePath, JSON.stringify(config, null, 2));
 }
 
 function getProfilePath(accountId) {
@@ -57,6 +57,18 @@ function createProfileResponse(profileData, profileId, rvn) {
             profile: profileData
         }],
         profileCommandRevision: rvn ? parseInt(rvn) + 1 : 1,
+        serverTime: new Date().toISOString(),
+        responseVersion: 1
+    };
+}
+
+function createEmptyResponse(profileId, rvn) {
+    return {
+        profileRevision: rvn ? parseInt(rvn) : 1,
+        profileId: profileId,
+        profileChangesBaseRevision: parseInt(rvn) || 1,
+        profileChanges: [],
+        profileCommandRevision: rvn ? parseInt(rvn) : 1,
         serverTime: new Date().toISOString(),
         responseVersion: 1
     };
@@ -99,6 +111,7 @@ function createCommonCore(config, accountId, profile) {
     if (!profile) {
         profile = {};
     }
+
     profile._id = accountId;
     profile.accountId = accountId;
 
@@ -106,40 +119,38 @@ function createCommonCore(config, accountId, profile) {
     profile.updated = new Date().toISOString();
 
     profile.profileId = 'athena';
+
     if (!profile.items) {
         profile.items = {};
     }
 
-    if (config.vbucks !== undefined) {
+    if (config && config.vbucks !== undefined) {
         profile.items['Currency:MtxPurchased'] = {
             quantity: config.vbucks
         };
     }
 
-    if (!profile.stats || !profile.stats.attributes) {
-        profile.stats = {
-            attributes: {}
-        };
-    }
-
-    profile.stats.attributes.mtx_affiliate = 'Itztiva';
-
     return profile;
 }
 
 function createCommonPublic(accountId, profile) {
+    if (!profile) {
+        profile = {};
+    }
 
-	profile.accountId = accountId;
+    profile.accountId = accountId;
+    profile.created = new Date().toISOString();
+    profile.updated = new Date().toISOString();
+    profile.profileId = 'athena';
 
-	profile.created = new Date().toISOString();
-	profile.updated = new Date().toISOString();
-
-	profile.profileId = 'athena';
-
-	return profile;
+    return profile;
 }
 
 function createCollections(accountId, profile) {
+    if (!profile) {
+        profile = {};
+    }
+    
 	profile.accountId = accountId;
 
 	profile.created = new Date().toISOString();
@@ -149,8 +160,6 @@ function createCollections(accountId, profile) {
 
 	return profile;
 }
-
-
 
 express.post('/fortnite/api/game/v2/profile/:accountId/client/:command', (req, res) => {
     const command = req.params.command;
@@ -183,12 +192,12 @@ express.post('/fortnite/api/game/v2/profile/:accountId/client/:command', (req, r
                         profileId
                     ));
                     break;
-                case 'common_core':
-                    res.json(createProfileResponse(
-                        createCommonCore(accountId, profile),
-                        profileId
-                    ));
-                    break;
+                    case 'common_core':
+                        res.json(createProfileResponse(
+                            createCommonCore(config, accountId, profile), 
+                            profileId
+                        ));
+                        break;
                 case 'common_public':
                     res.json(createProfileResponse(
                         createCommonPublic(accountId, profile),
@@ -223,11 +232,13 @@ express.post('/fortnite/api/game/v2/profile/:accountId/client/:command', (req, r
         case 'VerifyRealMoneyPurchase':
             res.json(createProfileResponse(
                 createCommonCore(accountId, profile)
-            ));
+            ), "common_core", rvn);
             break;
-		/*	case "RedeemRealMoneyPurchases": {
+            case "ClaimMfaEnabled": {
 				break;
-			} */
+			}
+        case "RedeemRealMoneyPurchases": // its supposed to be a blank mcp profile iirc ok
+            break;
         case 'SetItemFavoriteStatusBatch':
             let index = 0;
             for (let itemId of req.body.itemIds) {
@@ -254,7 +265,7 @@ express.post('/fortnite/api/game/v2/profile/:accountId/client/:command', (req, r
                 }
                 index += 1;
             }
-            saveConfig(accountId, config);
+            saveConfig(process.env.directory, accountId, config);
             res.json(createProfileResponse(
                 createAthenaProfile(config, accountId, profile),
                 profileId,
@@ -308,11 +319,11 @@ express.post('/fortnite/api/game/v2/profile/:accountId/client/:command', (req, r
 							config[slotName].Variants[6] = [{ variants: variantUpdates }];
 						}
 
-						saveConfig(backendConfig.directory, accountId, config);
+                        saveConfig(process.env.directory, accountId, config);
 						break;
 				}
 				var newAthena = createAthena(config, accountId, profile);
-				res.json(createResponse(newAthena, profileId, rvn));
+				res.json(createProfileResponse(newAthena, profileId, rvn));
 				break;
 
 			default:
