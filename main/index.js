@@ -15,6 +15,15 @@ mongoose.connection.on('connected', () => {
     log.auth('Connected to MongoDB');
 });
 
+express.use((req, res, next) => {
+    if (req.originalUrl === '/favicon.ico') {
+      next(); 
+    } else {
+      log.backend(`${req.method} ${req.originalUrl}`);
+      next();
+    }
+});
+
 const load = path.join(__dirname, 'operations');
 
 fs.readdirSync(load).forEach(fileName => {
@@ -22,15 +31,6 @@ fs.readdirSync(load).forEach(fileName => {
     if (fileName.endsWith('.js')) {
         const route = require(filePath);
         express.use(route);
-    }
-});
-
-express.use((req, res, next) => {
-    if (req.originalUrl === '/favicon.ico') {
-      next(); 
-    } else {
-      log.backend(`${req.method} ${req.originalUrl}`);
-      next();
     }
 });
 

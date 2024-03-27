@@ -1,6 +1,5 @@
 const Express = require('express');
 const express = Express();
-const functions = require("../utils/functions/functions.js")
 const log = require("../utils/base/log.js")
 const User = require('../database/models/users.js');
 
@@ -23,10 +22,6 @@ express.get('/username/:secret', async (req, res) => {
     } else {
         res.status(400).json({ error: 'Secret is required' });
     }
-});
-
-express.get('/user', functions.verifysecret, (req, res) => {
-    res.json({ username: req.user.username }); 
 });
 
 module.exports = express
