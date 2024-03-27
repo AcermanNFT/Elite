@@ -10,8 +10,8 @@ require("dotenv").config({
 
 express.get("/fortnite/api/cloudstorage/system/config", async (req, res) => {
   var csFiles = [];
-  for (var file of fs.readdirSync("../local/cloud/")) {
-    var f = fs.readFileSync("../local/cloud/" + file).toString();
+  for (var file of fs.readdirSync("main/local//cloud/")) {
+    var f = fs.readFileSync("main/local/cloud/" + file).toString();
     csFiles.push({
       uniqueF: file,
       F: file,
@@ -31,14 +31,14 @@ express.get("/fortnite/api/cloudstorage/system/config", async (req, res) => {
 
 express.get('/fortnite/api/cloudstorage/system/:F', (req, res) => {
   const F = req.params.F;
-  const FP = path.join(__dirname, '../local/cloud', F);
+  const FP = path.join(__dirname, 'main/local/cloud', F);
 
   if (fs.existsSync(FP)) {
     res.sendFile(FP);
   } else {
     res.status(404).end();
   }
-});
+}); 
 
 express.get('/fortnite/api/cloudstorage/system', async (req, res) => {
   if (!req.headers['user-agent'] || !req.headers['user-agent'].includes('Mozilla')) {
