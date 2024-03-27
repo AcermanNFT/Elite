@@ -3,31 +3,48 @@ const express = Express();
 const fs = require('fs');
 const log = require("../utils/base/log.js");
 const functions = require("../utils/functions/functions.js");
-const random = require('random');
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '..', 'config', '.env') });
 
 function checkAndCreateProfile(accountId) {
-    const profilePath = `${process.env.directory}/cache/profiles/${accountId}.json`;
+    const profilePath = getProfilePath(accountId);
     if (!fs.existsSync(profilePath)) {
-        const templatePath = `${process.env.directory}/cache/templates/config.json`;
+        const templatePath = getTemplatePath();
         fs.copyFileSync(templatePath, profilePath);
     }
 }
 
 function loadConfig(accountId) {
-    const profilePath = `${process.env.directory}/cache/profiles/${accountId}.json`;
+    const profilePath = getProfilePath(accountId);
+    if (!fs.existsSync(profilePath)) {
+        throw new Error(`Profile not found for account ${accountId}`);
+    }
     return JSON.parse(fs.readFileSync(profilePath));
 }
 
 function loadProfile(profileId) {
-    const profilePath = `${process.env.directory}/cache/templates/profile_${profileId}.json`;
+    const profilePath = getTemplateProfilePath(profileId);
+    if (!fs.existsSync(profilePath)) {
+        throw new Error(`Profile template not found for profileId ${profileId}`);
+    }
     return JSON.parse(fs.readFileSync(profilePath));
 }
 
 function saveConfig(accountId, data) {
-    const profilePath = `${process.env.directory}/cache/profiles/${accountId}.json`;
+    const profilePath = getProfilePath(accountId);
     fs.writeFileSync(profilePath, JSON.stringify(data, null, 2));
+}
+
+function getProfilePath(accountId) {
+    return `${process.env.directory}/profiles/${accountId}.json`;
+}
+
+function getTemplatePath() {
+    return `${process.env.directory}/athena/config.json`;
+}
+
+function getTemplateProfilePath(profileId) {
+    return `${process.env.directory}/athena/profile_${profileId}.json`;
 }
 
 function createProfileResponse(profileData, profileId, rvn) {
@@ -56,6 +73,17 @@ function createProfileError(errorCode, errorMessage, numericErrorCode, originati
     };
 }
 
+function createError(errorCode, errorMessage, numericErrorCode, originatingService, intent, messageVars) {
+    return {
+        errorCode: errorCode,
+        errorMessage: errorMessage,
+        numericErrorCode: numericErrorCode,
+        originatingService: originatingService,
+        messageVars: messageVars || undefined,
+        intent: intent || 'prod'
+    };
+}
+
 function createProfile(accountId, profileData) {
     profileData.accountId = accountId;
     profileData.created = new Date().toISOString();
@@ -66,6 +94,62 @@ function createProfile(accountId, profileData) {
 function createAthenaProfile(config, accountId, profile) {
     return profile;
 }
+
+function createCommonCore(config, accountId, profile) {
+    if (!profile) {
+        profile = {};
+    }
+    profile._id = accountId;
+    profile.accountId = accountId;
+
+    profile.created = new Date().toISOString();
+    profile.updated = new Date().toISOString();
+
+    profile.profileId = 'athena';
+    if (!profile.items) {
+        profile.items = {};
+    }
+
+    if (config.vbucks !== undefined) {
+        profile.items['Currency:MtxPurchased'] = {
+            quantity: config.vbucks
+        };
+    }
+
+    if (!profile.stats || !profile.stats.attributes) {
+        profile.stats = {
+            attributes: {}
+        };
+    }
+
+    profile.stats.attributes.mtx_affiliate = 'Itztiva';
+
+    return profile;
+}
+
+function createCommonPublic(accountId, profile) {
+
+	profile.accountId = accountId;
+
+	profile.created = new Date().toISOString();
+	profile.updated = new Date().toISOString();
+
+	profile.profileId = 'athena';
+
+	return profile;
+}
+
+function createCollections(accountId, profile) {
+	profile.accountId = accountId;
+
+	profile.created = new Date().toISOString();
+	profile.updated = new Date().toISOString();
+
+	profile.profileId = 'athena';
+
+	return profile;
+}
+
 
 
 express.post('/fortnite/api/game/v2/profile/:accountId/client/:command', (req, res) => {
@@ -141,6 +225,9 @@ express.post('/fortnite/api/game/v2/profile/:accountId/client/:command', (req, r
                 createCommonCore(accountId, profile)
             ));
             break;
+		/*	case "RedeemRealMoneyPurchases": {
+				break;
+			} */
         case 'SetItemFavoriteStatusBatch':
             let index = 0;
             for (let itemId of req.body.itemIds) {
