@@ -1,12 +1,27 @@
 const fs = require("fs");
 const path = require("path");
+const log = require("../base/log.js");
+const mongoose = require('mongoose');
 const crypto = require('crypto');
+const cdata = require('../../database/local/collections.json');
 const Express = require('express');
 const express = Express();
 require('dotenv').config({ path: path.resolve(__dirname, '.', 'config', '.env')});
 
 function genSecret() {
     return crypto.randomBytes(16).toString('hex'); 
+}
+
+async function collections() {
+    const ec = await mongoose.connection.db.listCollections().toArray();
+    
+    cdata.collections.forEach(async (collectionName) => {
+        const ce = ec.some(collection => collection.name === collectionName);
+        if (!ce) {
+            mongoose.model(collectionName, {});
+            log.backend(`Table "${collectionName}" created`);
+        }
+    });
 }
 
 const verifysecret = async (req, res, next) => {
@@ -145,5 +160,6 @@ module.exports = {
     contentpages,
     version,
     genSecret,
-    verifysecret
+    verifysecret,
+    collections
 };

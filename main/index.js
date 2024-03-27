@@ -2,6 +2,7 @@ const Express = require('express');
 const express = Express();
 const mongoose = require('mongoose');
 const fs = require("fs");
+const functions = require("./utils/functions/functions.js");
 const log = require("./utils/base/log.js");
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '.', 'config', '.env')});
@@ -13,6 +14,8 @@ mongoose.connect(process.env.DB);
 
 mongoose.connection.on('connected', () => {
     log.auth('Connected to MongoDB');
+    start();
+    functions.collections();
 });
 
 express.use((req, res, next) => {
@@ -48,8 +51,10 @@ express.use(async (req, res, next) => {
     });
 });
 
-express.listen(port, () => {
-    log.backend(`Backend Started on Port ${port}`);
-});
+function start() {
+    express.listen(port, () => {
+        log.backend(`Backend Started on Port ${port}`);
+    });
+}
 
 module.exports = express
