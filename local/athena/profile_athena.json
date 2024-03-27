@@ -1,13 +1,13 @@
 {
   "_id": "",
-  "Update": "never",
+  "Update": "elite",
   "created": "2020-10-22T04:50:49.839Z",
   "updated": "2020-12-04T15:20:43.863Z",
   "rvn": 19,
   "wipeNumber": 1,
   "accountId": "",
   "profileId": "athena",
-  "version": "elite_2",
+  "version": "elite",
   "items": {
     "sandbox_loadout": {
       "templateId": "CosmeticLocker:cosmeticlocker_athena",
