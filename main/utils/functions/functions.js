@@ -5,7 +5,7 @@ const Express = require('express');
 const express = Express();
 require('dotenv').config({ path: path.resolve(__dirname, '.', 'config', '.env')});
 
-function generateRandomSecret() {
+function genSecret() {
     return crypto.randomBytes(16).toString('hex'); 
 }
 
@@ -144,6 +144,6 @@ function contentpages(req) {
 module.exports = {
     contentpages,
     version,
-    generateRandomSecret,
+    genSecret,
     verifysecret
 };

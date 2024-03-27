@@ -12,7 +12,7 @@ mongoose.set('strictQuery', false);
 mongoose.connect(process.env.DB);
 
 mongoose.connection.on('connected', () => {
-    log.backend('Connected to MongoDB');
+    log.auth('Connected to MongoDB');
 });
 
 const load = path.join(__dirname, 'operations');
@@ -49,7 +49,7 @@ express.use(async (req, res, next) => {
 });
 
 express.listen(port, () => {
-    log.backend(`started on port ${port}`);
+    log.backend(`Backend Started on Port ${port}`);
 });
 
 module.exports = express

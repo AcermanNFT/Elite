@@ -22,7 +22,7 @@ express.post('/register', async (req, res) => {
             return;
         }
 
-        const secret = functions.generateRandomSecret();
+        const secret = functions.genSecret();
 
         const newUser = new User({ username, secret });
         await newUser.save();
