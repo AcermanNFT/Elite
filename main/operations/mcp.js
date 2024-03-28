@@ -30,9 +30,9 @@ function loadProfile(profileId) {
     return JSON.parse(fs.readFileSync(profilePath));
 }
 function saveConfig(directory, accountId, config) {
-    const profilePath = getProfilePath(directory, accountId);
-    console.log("Profile Path:", profilePath); // Log the profile path
-    fs.writeFileSync(profilePath, JSON.stringify(config, null, 2));
+    const profilePath = `${directory}/profiles/${accountId}.json`;
+    console.log("Profile Path:", profilePath); 
+    console.log("Saving config:", config); 
 }
 
 function getProfilePath(accountId) {
@@ -96,11 +96,13 @@ function createError(errorCode, errorMessage, numericErrorCode, originatingServi
     };
 }
 
-function createProfile(accountId, profileData) {
-    profileData.accountId = accountId;
-    profileData.created = new Date().toISOString();
-    profileData.updated = new Date().toISOString();
-    return profileData;
+function saveDummyConfig() {
+    const dummyConfig = {
+        vbucks: 1000, 
+        favorites: [{ id: 'dummyItemId1' }, { id: 'dummyItemId2' }] 
+    };
+
+    saveConfig(process.env.directory, 'dummyAccountId', dummyConfig);
 }
 
 function createAthenaProfile(config, accountId, profile) {
